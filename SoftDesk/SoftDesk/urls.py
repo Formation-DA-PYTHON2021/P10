@@ -18,22 +18,23 @@ from django.urls import path, include
 from rest_framework import routers
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from app.Views import ProjectAPIViewset, IssueAPIViewset, CommentAPIViewset
+from app.Views import ProjectViewset
 
 router = routers.SimpleRouter()
-router.register('projects', ProjectAPIViewset, basename='projects')
-"""router.register('projects/{id}', ProjectAPIViewset, basename='projects_id')
-router.register('projects/{id}/users', ProjectAPIViewset, basename='projects_id_user')
-router.register('projects/{id}.user/{id}', ProjectAPIViewset, basename='projects_id_user_id')
-router.register('projects/{id}/issues', IssueAPIViewset, basename='issues')
-router.register('projects/{id}/issues/{id}', IssueAPIViewset, basename='issues_id')
-router.register('projects/{id}/issues/{id}/comments', CommentAPIViewset, basename='comments')
-router.register('projects/{id}/issues/{id}/comments/{id}', CommentAPIViewset, basename='comments_id')
+router.register('projects', ProjectViewset, basename='projects')
+"""router.register('projects/{id}', ProjectViewset, basename='projects_id')
+router.register('projects/{id}/users', ContributorViewset, basename='projects_id_user')
+router.register('projects/{id}/user/{id}', ProjectViewset, basename='projects_id_user_id')
+router.register('projects/{id}/issues', IssueViewset, basename='issues')
+router.register('projects/{id}/issues/{id}', IssueViewset, basename='issues_id')
+router.register('projects/{id}/issues/{id}/comments', CommentViewset, basename='comments')
+router.register('projects/{id}/issues/{id}/comments/{id}', CommentViewset, basename='comments_id')
 """
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/', include(router.urls))
 ]
+
+"""    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),"""
