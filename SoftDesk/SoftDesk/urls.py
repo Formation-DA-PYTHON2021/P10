@@ -18,22 +18,19 @@ from django.urls import path, include
 from rest_framework import routers
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from app.Views import ProjectViewset
+from app.Views import ProjectViewset, IssueViewset, CommentViewset, ContributorViewset
 
 router = routers.SimpleRouter()
-router.register('projects', ProjectViewset, basename='projects')
-"""router.register('projects/{id}', ProjectViewset, basename='projects_id')
-router.register('projects/{id}/users', ContributorViewset, basename='projects_id_user')
-router.register('projects/{id}/user/{id}', ProjectViewset, basename='projects_id_user_id')
-router.register('projects/{id}/issues', IssueViewset, basename='issues')
-router.register('projects/{id}/issues/{id}', IssueViewset, basename='issues_id')
-router.register('projects/{id}/issues/{id}/comments', CommentViewset, basename='comments')
-router.register('projects/{id}/issues/{id}/comments/{id}', CommentViewset, basename='comments_id')
-"""
+router.register('projects', ProjectViewset, basename='projects'),
+router.register('issues', IssueViewset, basename='issues')
+router.register('comments', CommentViewset, basename='comments')
+router.register('users',ContributorViewset, basename='contributors')
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api-auth/', include('rest_framework.urls')),
-    path('api/', include(router.urls))
+    path('', include('rest_framework.urls')),
+    path('', include(router.urls)),
+
 ]
 
 """    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),

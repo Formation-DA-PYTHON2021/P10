@@ -1,15 +1,11 @@
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.response import Response
-from rest_framework.decorators import action
 
-from .models import Project, Issue, Comment
+
+from .models import Project, Issue, Comment, Contributor
 from .serializers import (
-    ProjectListSerializer,
-    ProjectDetailSerializer,
-    ContributorDetailSerializer,
-    ContributorListSerializer,
-    IssueListSerializer,
-    IssueDetailSerializer,
+    ProjectSerializer,
+    ContributorSerializer,
+    IssueSerializer,
     CommentSerializer)
 from .permissions import (
     IsAdminAuthenticated,
@@ -19,67 +15,48 @@ from .permissions import (
     CommentPermission)
 
 
-class MultipleSerializerMixin:
+class ProjectViewset(ModelViewSet):
 
-    detail_serializer_class = None
-
-    def get_serializer_class(self):
-        if self.action == 'retrieve' and self.detail_serializer_class is not None:
-            return self.detail_serializer_class
-        return super().get_serializer_class()
-
-
-class ProjectViewset(MultipleSerializerMixin, ModelViewSet):
-
-    serializer_class = ProjectListSerializer
-    detail_serializer_class = ProjectDetailSerializer
-    permission_classes = [IsAdminAuthenticated, ProjectPermission]
+    serializer_class = ProjectSerializer
+    permission_classes = [IssuePermission, ProjectPermission]
 
     def get_queryset(self):
-        return Project.objects.filter(active=True)
+        user = self.request.user
+        user_contributor = Contributor.objects.filter(user_id=user)
+        project_ids = []
 
-    @action(detail=True, methods=['post'])
-    def disable(self, request, pk):
-        self.get.object().disable()
-        return Response
+        for contrib in user_contributor:
+            project_ids.append(contrib.project_id.id)
+        return Project.objects.filter(id__in=project_ids)
 
 
-class IssueViewset(MultipleSerializerMixin, ModelViewSet):
+class IssueViewset(ModelViewSet):
 
-    serializer_class = IssueListSerializer
-    detail_serializer_class = IssueDetailSerializer
+    serializer_class = IssueSerializer
     permission_classes = [IsAdminAuthenticated, IssuePermission]
 
     def get_queryset(self):
-        queryset = Issue.objects.filter(active=True)
-        project_id = self.request.GET.get('project_id')
-        if project_id:
-            queryset = queryset.filter(project_id=project_id)
-        return queryset
+        user = self.request.user
+        user_contrib = Contributor.objects.filter(user_id=user)
+        project_ids = []
 
-    @action(detail=True, methods=['post'])
-    def disable(self, request, pk):
-        self.get_object().disable()
-        return Response
+        for contrib in user_contrib:
+            project_ids.append(contrib.project_id.id)
+        return Issue.objects.filter(id__in=project_ids)
 
 
-class ContributorViewset(MultipleSerializerMixin, ModelViewSet):
+class ContributorViewset(ModelViewSet):
 
-    serializer_class = ContributorListSerializer
-    serializer_class = ContributorDetailSerializer
+    serializer_class = ContributorSerializer
     permission_classes = [IsAdminAuthenticated, ContributorPermissions]
 
     def get_queryset(self):
-        queryset = Project.objects.filter(active=True)
-        project_id = self.request.GET.get('project_id')
-        if project_id:
-            queryset = queryset.filter(project_id=project_id)
-        return queryset
-
-    @action(detail=True, methods=['post'])
-    def disable(self, request, pk):
-        self.get_object().disable()
-        return Response
+        user = self.request.user
+        user_contributor = Contributor.objects.filter(user_id=user)
+        project_ids = []
+        for contrib in user_contributor:
+            project_ids.append(contrib.project_id.id)
+        return Contributor.objects.filter(id__in=project_ids)
 
 
 class CommentViewset(ModelViewSet):
@@ -88,8 +65,10 @@ class CommentViewset(ModelViewSet):
     permission_classes = [IsAdminAuthenticated, CommentPermission]
 
     def get_queryset(self):
-        queryset = Comment.objects.filter(active=True)
-        issue_id = self.request.GET.get('issue_id')
-        if issue_id is not None:
-            queryset = queryset.filter(issue_id=issue_id)
-        return queryset
+        user = self.request.user
+        user_contributor = Contributor.objects.filter(user_id=user)
+        project_ids = []
+
+        for contrib in user_contributor:
+            project_ids.append(contrib.project_id.id)
+        return Comment.objects.filter(id__in=project_ids)
