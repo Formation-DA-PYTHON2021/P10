@@ -39,6 +39,14 @@ comment_router = routers.NestedSimpleRouter(
 )
 comment_router.register(r"comments/?", CommentViewset, basename="comments")
 
+contributor_router = routers.NestedSimpleRouter(
+    router,
+    r"projects/?",
+    lookup="project",
+    trailing_slash=False
+)
+contributor_router.register(r"users/?", IssueViewset, basename="users")
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -46,7 +54,7 @@ urlpatterns = [
     path(r'', include(router.urls)),
     path(r'', include(issue_router.urls)),
     path(r'', include(comment_router.urls)),
-
+    path(r'', include(contributor_router.urls)),
 ]
 
 """    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),

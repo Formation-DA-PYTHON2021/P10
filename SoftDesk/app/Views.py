@@ -16,10 +16,19 @@ from .permissions import (
     CommentPermission)
 
 
-class ProjectViewset(ViewSet):
+class ProjectViewset(ModelViewSet):
 
     serializer_class = ProjectSerializer
     permission_classes = [IsAuthenticated, ProjectPermission]
+
+    def get_queryset(self):
+        user = self.request.user
+        user_contributor = Contributor.objects.filter(user_id=user)
+        project_ids = []
+
+        for contrib in user_contributor:
+            project_ids.append(contrib.project_id.id)
+        return Project.objects.filter(id__in=project_ids)
 
     def list(self, request,):
         user = self.request.user
@@ -46,21 +55,20 @@ class ProjectViewset(ViewSet):
         serializer = ProjectSerializer(project)
         return Response(serializer.data)
 
-""" 
-    def get_queryset(self):
-        user = self.request.user
-        user_contributor = Contributor.objects.filter(user_id=user)
-        project_ids = []
 
-        for contrib in user_contributor:
-            project_ids.append(contrib.project_id.id)
-        return Project.objects.filter(id__in=project_ids)
-"""
-
-class IssueViewset(ViewSet):
+class IssueViewset(ModelViewSet):
 
     serializer_class = IssueSerializer
     permission_classes = [IsAuthenticated, IssuePermission]
+
+    def get_queryset(self):
+        user = self.request.user
+        user_contrib = Contributor.objects.filter(user_id=user)
+        project_ids = []
+
+        for contrib in user_contrib:
+            project_ids.append(contrib.project_id.id)
+        return Issue.objects.filter(id__in=project_ids)
 
     def list(self, request, project_pk=None):
         queryset = Issue.objects.filter(project=project_pk)
@@ -72,17 +80,6 @@ class IssueViewset(ViewSet):
         issue = get_object_or_404(queryset, pk=pk)
         serializer = IssueSerializer(issue)
         return Response(serializer.data)
-
-
-"""
-    def get_queryset(self):
-        user = self.request.user
-        user_contrib = Contributor.objects.filter(user_id=user)
-        project_ids = []
-
-        for contrib in user_contrib:
-            project_ids.append(contrib.project_id.id)
-        return Issue.objects.filter(id__in=project_ids)"""
 
 
 class ContributorViewset(ModelViewSet):
@@ -98,11 +95,31 @@ class ContributorViewset(ModelViewSet):
             project_ids.append(contrib.project_id.id)
         return Contributor.objects.filter(id__in=project_ids)
 
+    def list(self, request, project_pk=None):
+        queryset = Contributor.objects.filter(project=project_pk)
+        serializer = ContributorSerializer(queryset, many=True)
+        return Response(serializer.data)
 
-class CommentViewset(ViewSet):
+    def retrieve(self, request, pk=None, project_pk=None):
+        queryset = Contributor.objects.filter(pk=pk, project=project_pk)
+        contributor = get_object_or_404(queryset, pk=pk)
+        serializer = IssueSerializer(contributor)
+        return Response(serializer.data)
+
+
+class CommentViewset(ModelViewSet):
 
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticated, CommentPermission]
+
+    def get_queryset(self):
+        user = self.request.user
+        user_contributor = Contributor.objects.filter(user_id=user)
+        project_ids = []
+
+        for contrib in user_contributor:
+            project_ids.append(contrib.project_id.id)
+        return Comment.objects.filter(id__in=project_ids)
 
     def list(self, request, project_pk=None, issue_pk=None):
         queryset = Comment.objects.filter(issue_id__project=project_pk, issue_id=issue_pk)
@@ -114,12 +131,3 @@ class CommentViewset(ViewSet):
         issue = get_object_or_404(queryset, pk=pk)
         serializer = CommentSerializer(issue)
         return Response(serializer.data)
-"""
-    def get_queryset(self):
-        user = self.request.user
-        user_contributor = Contributor.objects.filter(user_id=user)
-        project_ids = []
-
-        for contrib in user_contributor:
-            project_ids.append(contrib.project_id.id)
-        return Comment.objects.filter(id__in=project_ids)"""

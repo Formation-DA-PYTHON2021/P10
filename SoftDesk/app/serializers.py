@@ -43,7 +43,9 @@ class ProjectSerializer(serializers.ModelSerializer):
 
 
 class ContributorSerializer(serializers.ModelSerializer):
-
+    parent_lookup_kwargs = {
+        'project_pk': 'project_pk',
+    }
     class Meta:
         model = Contributor
         fields = '__all__'
