@@ -62,7 +62,7 @@ class Issue(models.Model):
     tag = models.CharField(max_length=7, choices=TAGS)
     priority = models.CharField(max_length=6, choices=PRIORITIES)
     status = models.CharField(max_length=11, choices=STATUSES, default='TODO')
-    project_id = models.ForeignKey(to=Project, on_delete=models.CASCADE)
+    project = models.ForeignKey(to=Project, on_delete=models.CASCADE)
     author = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     assignee_user_id = models.ForeignKey(to=Contributor, on_delete=models.CASCADE)
     created_time = models.DateTimeField(auto_now_add=True)

@@ -15,21 +15,37 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework import routers
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_nested import routers
+#from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from app.Views import ProjectViewset, IssueViewset, CommentViewset, ContributorViewset
 
 router = routers.SimpleRouter()
-router.register('projects', ProjectViewset, basename='projects'),
-router.register('issues', IssueViewset, basename='issues')
-router.register('comments', CommentViewset, basename='comments')
-router.register('users',ContributorViewset, basename='contributors')
+router.register(r"projects/?", ProjectViewset, basename='projects')
+
+issue_router = routers.NestedSimpleRouter(
+    router,
+    r"projects/?",
+    lookup="project",
+    trailing_slash=False
+)
+issue_router.register(r"issues/?", IssueViewset, basename="issues")
+
+comment_router = routers.NestedSimpleRouter(
+    issue_router,
+    r"issues/?",
+    lookup="issue",
+    trailing_slash=False
+)
+comment_router.register(r"comments/?", CommentViewset, basename="comments")
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('rest_framework.urls')),
-    path('', include(router.urls)),
+    path(r'', include(router.urls)),
+    path(r'', include(issue_router.urls)),
+    path(r'', include(comment_router.urls)),
 
 ]
 
