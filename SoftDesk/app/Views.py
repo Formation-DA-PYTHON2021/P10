@@ -1,9 +1,12 @@
-from rest_framework.viewsets import ViewSet, ModelViewSet
+from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
-from rest_framework.generics import get_object_or_404
+from rest_framework.generics import get_object_or_404, GenericAPIView
+from django.conf import settings
 
 from .models import Project, Issue, Comment, Contributor
 from .serializers import (
+    UserSerializer,
+    SignupSerializer,
     ProjectSerializer,
     ContributorSerializer,
     IssueSerializer,
@@ -15,6 +18,17 @@ from .permissions import (
     IssuePermission,
     CommentPermission)
 
+
+class SignupViewset(GenericAPIView):
+
+    serializer_class = SignupSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        return Response({
+        "user": UserSerializer(user, context=self.get_serializer_context()).data})
 
 class ProjectViewset(ModelViewSet):
 
