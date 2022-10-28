@@ -1,7 +1,6 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404, GenericAPIView
-from django.conf import settings
 
 from .models import Project, Issue, Comment, Contributor
 from .serializers import (
@@ -12,7 +11,6 @@ from .serializers import (
     IssueSerializer,
     CommentSerializer)
 from .permissions import (
-    IsAuthenticated,
     ProjectPermission,
     ContributorPermissions,
     IssuePermission,
@@ -27,19 +25,18 @@ class SignupViewset(GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        return Response({
-        "user": UserSerializer(user, context=self.get_serializer_context()).data})
+        return Response({"user": UserSerializer(user, context=self.get_serializer_context()).data})
+
 
 class ProjectViewset(ModelViewSet):
 
     serializer_class = ProjectSerializer
-    permission_classes = [IsAuthenticated, ProjectPermission]
+    permission_classes = [ProjectPermission]
 
     def get_queryset(self):
         user = self.request.user
         user_contributor = Contributor.objects.filter(user_id=user)
         project_ids = []
-
         for contrib in user_contributor:
             project_ids.append(contrib.project_id.id)
         return Project.objects.filter(id__in=project_ids)
@@ -69,11 +66,26 @@ class ProjectViewset(ModelViewSet):
         serializer = ProjectSerializer(project)
         return Response(serializer.data)
 
+    def create(self, request, *args, **kwargs):
+        user = self.request.user
+        data = {
+            "title": request.POST.get('title', None),
+            "description": request.POST.get('description', None),
+            "type": request.POST.get('type', None),
+            "author": request.POST.get('author', None),
+        }
+        serializer = self.serializer_class(data=data, context={'author': user})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(data=serializer.data)
+        else:
+            return Response(data=serializer.errors)
+
 
 class IssueViewset(ModelViewSet):
 
     serializer_class = IssueSerializer
-    permission_classes = [IsAuthenticated, IssuePermission]
+    permission_classes = [IssuePermission]
 
     def get_queryset(self):
         user = self.request.user
@@ -99,32 +111,33 @@ class IssueViewset(ModelViewSet):
 class ContributorViewset(ModelViewSet):
 
     serializer_class = ContributorSerializer
-    permission_classes = [IsAuthenticated, ContributorPermissions]
+    permission_classes = [ContributorPermissions]
 
     def get_queryset(self):
         user = self.request.user
         user_contributor = Contributor.objects.filter(user_id=user)
         project_ids = []
+
         for contrib in user_contributor:
             project_ids.append(contrib.project_id.id)
         return Contributor.objects.filter(id__in=project_ids)
 
     def list(self, request, project_pk=None):
-        queryset = Contributor.objects.filter(project=project_pk)
+        queryset = Contributor.objects.filter(project_id=project_pk)
         serializer = ContributorSerializer(queryset, many=True)
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None, project_pk=None):
-        queryset = Contributor.objects.filter(pk=pk, project=project_pk)
+        queryset = Contributor.objects.filter(pk=pk, project_id=project_pk)
         contributor = get_object_or_404(queryset, pk=pk)
-        serializer = IssueSerializer(contributor)
+        serializer = ContributorSerializer(contributor)
         return Response(serializer.data)
 
 
 class CommentViewset(ModelViewSet):
 
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthenticated, CommentPermission]
+    permission_classes = [CommentPermission]
 
     def get_queryset(self):
         user = self.request.user

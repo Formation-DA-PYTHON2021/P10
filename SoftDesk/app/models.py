@@ -56,6 +56,7 @@ class Contributor(models.Model):
     def __str__(self):
         return str(f'{self.user_id} - project: {self.project_id} - role: {self.role}')
 
+
 class Issue(models.Model):
     title = models.CharField(max_length=128)
     desc = models.CharField(max_length=2048)

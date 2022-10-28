@@ -45,12 +45,13 @@ contributor_router = routers.NestedSimpleRouter(
     lookup="project",
     trailing_slash=False
 )
-contributor_router.register(r"users/?", IssueViewset, basename="users")
+contributor_router.register(r"users/?", ContributorViewset, basename="users")
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('signup/', SignupViewset.as_view(), name='signup'),
+    path('login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('', include('rest_framework.urls')),
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

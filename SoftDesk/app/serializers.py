@@ -9,6 +9,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('id', 'username')
 
+
 class SignupSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -29,6 +30,7 @@ class CommentSerializer(serializers.ModelSerializer):
         'issue_pk': 'issue_id__pk',
         'project_pk': 'issue_id__project__pk'
     }
+
     class Meta:
         model = Comment
         fields = '__all__'
@@ -41,6 +43,7 @@ class IssueSerializer(serializers.ModelSerializer):
     parent_lookup_kwargs = {
         'project_pk': 'project_pk',
     }
+
     class Meta:
         model = Issue
         fields = '__all__'
@@ -68,10 +71,10 @@ class ContributorSerializer(serializers.ModelSerializer):
     parent_lookup_kwargs = {
         'project_pk': 'project_pk',
     }
+
     class Meta:
         model = Contributor
         fields = '__all__'
-        read_only__fields = ('project_id', 'role', 'user_id')
 
     def create(self, validated_data):
         return Contributor.objects.create(**validated_data)
