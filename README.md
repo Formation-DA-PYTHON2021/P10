@@ -71,9 +71,38 @@ L'utilisateur ne peut avoir accès à ces fonctionnalités que si il a les permi
 - L'auteur d'un projet, problème ou commentaire, est autorisé à modifier ou supprimer un élément comme projet, contributeur, problème, commentaires. nb: un auteur est un contributeur spécifique.
 - Le contributeur est autorisé à consulter, créer les éléments suivant : projet, contributeur, problème, commentaire.
 
+#### Liste des utilisateurs existants :
+
+| Nom           | Mot de Passe  |
+| ------------- | ------------- |
+| Superuser     | S3cret!!      |
+| Contrib1      | S3cret!!      |
+| Contrib2      | S3cret!!      |
+
 #### Point de terminaison : 
 
-
+| | Point de  terminaison d'API |Méthode HTTP   |URL            |
+|--| ---------------------------- | ------------- | ------------- |
+|1|Inscription de l'utilisateur | POST          | /signup/      |
+|2| Connexion de l'utilisateur  | POST          | /login/       |
+|3|  Déconnexion                |   POST        | /logout/      |
+|4|Récupérer la liste de tous les projects rattachés à l'utilisateur connecté|GET| /projects/|
+|5|Créer un projet |POST | /projects/ |
+|6| Récupérer les détails d'un project via son id  | GET   |/projects/{id}/ |
+|7|Mettre à jour un projet| PUT | /projects/{id}/|
+|8| Supprimer un projet et ses problèmes | DELETE |   /projects/{id}/|
+|9|  Ajouter un utilisateur (collaborateur) attachés à un projet |   POST |/projects/{id}/users/ |
+|10|Récupérer la liste de tous les utilisateur (users) attachés à un projet| GET|/projects/{id}/users/|
+|11|Supprimer un utilisateur d'un projet | DELETE | /projects/{id}/users/{id}/ |
+|12| Récupérer la liste des problèmes liès à un projet  |  GET |/projects/{id}/issues/ |
+|13|Créer un problème dans un projet| POST|/projects/{id}/issues/ |
+|14| Mettre à jour un problème dans un projet| PUT|/projects/{id}/issues/{id}/|
+|15| Supprimer un problème dans un projet  | DEL  | /projects/{id}/issues/{id}/|
+|16|Créer des commentaires sur un problème dans un projet|POST |/projects/{id}/issues/{id}/comments/{id}/|
+|17|Récupérer la liste de tout les commentaires liès à un problème |  GET  | /projects/{id}/issues/{id}/comments/|
+|18|Mettre à jour un commentaire|PUT | /projects/{id}/issues/{id}/comments/{id}/|
+|19|Suppprimer un commentaire | DELETE| /projects/{id}/issues/{id}/comments/{id}/  |
+|20|   Récupérer un commentaire via son id|  GET  | /projects/{id}/issues/{id}/comments/{id}/|
 #### Documentation
 La documentation Postman du projet est disponible sur le lien :
 
