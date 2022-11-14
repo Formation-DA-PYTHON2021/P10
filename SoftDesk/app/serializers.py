@@ -41,7 +41,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class IssueSerializer(serializers.ModelSerializer):
     parent_lookup_kwargs = {
-        'project_pk': 'project_pk',
+        'project_pk': 'project_id__pk',
     }
 
     class Meta:
@@ -69,7 +69,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
 class ContributorSerializer(serializers.ModelSerializer):
     parent_lookup_kwargs = {
-        'project_pk': 'project_pk',
+        'project_pk': 'project_id__pk',
     }
 
     class Meta:
