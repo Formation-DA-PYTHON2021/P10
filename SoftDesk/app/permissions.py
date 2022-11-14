@@ -2,13 +2,6 @@ from rest_framework import permissions
 from .models import Contributor
 
 
-def valid_contrib(user, project):
-    for contrib in Contributor.objects.filter(project_id=project.id):
-        if user == contrib.user_id:
-            return True
-    return False
-
-
 class ContributorPermissions(permissions.BasePermission):
     """
     Les contributeurs peuvent voir d'autres contributeurs
