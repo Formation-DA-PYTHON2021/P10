@@ -118,6 +118,12 @@ class IssueViewset(ModelViewSet):
         return Issue.objects.filter(id__in=project_ids)
 
     def list(self, request, project_pk=None):
+        user = self.request.user
+        user_contributor = Contributor.objects.filter(user_id=user)
+        project_ids = []
+        for contrib in user_contributor:
+            project_ids.append(contrib.project_id.id)
+
         queryset = Issue.objects.filter(project_id=project_pk)
         serializer = IssueSerializer(queryset, many=True)
         return Response(serializer.data)
@@ -168,6 +174,12 @@ class ContributorViewset(ModelViewSet):
         return Contributor.objects.filter(id__in=project_ids)
 
     def list(self, request, project_pk=None):
+        user = self.request.user
+        user_contributor = Contributor.objects.filter(user_id=user)
+        project_ids = []
+        for contrib in user_contributor:
+            project_ids.append(contrib.project_id.id)
+
         queryset = Contributor.objects.filter(project_id=project_pk)
         serializer = ContributorSerializer(queryset, many=True)
         return Response(serializer.data)
